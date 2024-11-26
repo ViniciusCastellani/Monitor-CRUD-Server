@@ -1,0 +1,10 @@
+2024-11-19 14:59:35.528742-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "DELETE [*]TABLE MONITOR"; expected "identifier"; SQL statement:
+DELETE TABLE MONITOR [42001-224]
+2024-11-19 15:12:40.758586-03:00 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "MONITOR" already exists; SQL statement:
+CREATE TABLE MONITOR ( id              int  AUTO_INCREMENT       PRIMARY KEY,
+                                               nome        VARCHAR(100)                    NOT NULL,
+                                               tipo           VARCHAR(100)                    NOT NULL,
+                                               tamanho   DOUBLE                               NOT NULL,
+                                               preco        DOUBLE                               NOT NULL) [42101-224]

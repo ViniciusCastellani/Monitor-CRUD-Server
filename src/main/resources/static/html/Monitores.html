@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewportXYZ" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
+    .w3-bar,h1,button {font-family: "Montserrat", sans-serif}
+    .fa-anchor,.fa-coffee {font-size:200px}
+
+    /* Ajuste de largura para inputs e botões em dispositivos móveis */
+    @media only screen and (max-width: 600px) {
+        .w3-input, .w3-button {
+            width: 100%;  /* Garantir que os campos ocupem toda a largura */
+        }
+        #monitorTable {
+            width: 100%;
+        }
+        .w3-container {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+  </style>
+  <title>Gerenciamento de Monitores</title>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="w3-top">
+  <div class="w3-bar w3-red w3-card w3-left-align w3-large">
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
+    <a href="#monitor-incluir" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Adicionar Monitor</a>
+    <a href="#monitor-visualizar" class="w3-bar-item w3-button w3-padding-large w3-hover-white">Visualizar Monitores</a>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="w3-container w3-red w3-center" style="padding:128px 16px">
+  <h1 class="w3-margin w3-jumbo">Gerenciamento de Monitores</h1>
+  <p class="w3-xlarge">Acesse as opções abaixo para adicionar, excluir ou visualizar monitores.</p>
+  <p class="w3-xlarge">Matheus Luan Franco - RA: 12325375</p>
+</header>
+
+<!-- Incluir Monitor -->
+<div class="w3-container" id="monitor-incluir">
+  <h2 class="w3-center">Adicionar Monitor</h2>
+  <form id="addMonitorForm" onsubmit="addMonitor(); return false;" class="w3-container">
+    <label for="nomeMonitor">Nome:</label>
+    <input type="text" id="nomeMonitor" required class="w3-input w3-border"><br><br>
+
+    <label for="tipoMonitor">Tipo:</label>
+    <input type="text" id="tipoMonitor" required class="w3-input w3-border"><br><br>
+
+    <label for="tamanhoMonitor">Tamanho:</label>
+    <input type="text" id="tamanhoMonitor" required class="w3-input w3-border"><br><br>
+
+    <label for="precoMonitor">Preço:</label>
+    <input type="number" id="precoMonitor" required class="w3-input w3-border"><br><br>
+
+    <button type="submit" class="w3-button w3-black w3-padding-large w3-large">Adicionar Monitor</button>
+  </form>
+</div>
+
+<!-- Visualizar Monitores -->
+<div class="w3-container" id="monitor-visualizar">
+  <h2 class="w3-center">Monitores Cadastrados</h2>
+  <div class="w3-responsive">
+    <table id="monitorTable" class="w3-table w3-bordered w3-striped">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Tamanho</th>
+        <th>Preço</th>
+        <th>Ações</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- Tabela de monitores será preenchida dinamicamente -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para Detalhes do Monitor -->
+<div id="monitorModal" class="w3-modal">
+  <div class="w3-modal-content w3-animate-zoom">
+    <div class="w3-container w3-blue">
+      <span onclick="document.getElementById('monitorModal').style.display='none'" class="w3-button w3-display-topright w3-large">&times;</span>
+      <h2>Detalhes do Monitor</h2>
+    </div>
+    <div class="w3-container">
+      <p id="monitorDetails"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Função para adicionar um novo monitor
+  function addMonitor() {
+      const nomeMonitor = document.getElementById("nomeMonitor").value;
+      const tipoMonitor = document.getElementById("tipoMonitor").value;
+      const tamanhoMonitor = document.getElementById("tamanhoMonitor").value;
+      const precoMonitor = document.getElementById("precoMonitor").value;
+
+      // Dados a serem enviados no corpo da requisição
+      const monitorData = {
+          nome: nomeMonitor,
+          tipo: tipoMonitor,
+          tamanho: tamanhoMonitor,
+          preco: precoMonitor
+      };
+
+      // Enviar requisição POST para a API
+      fetch('http://localhost:8080/api/monitor', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(monitorData),
+      })
+      .then(response => {
+          if (response.ok) {
+              alert('Monitor adicionado com sucesso!');
+              loadMonitores(); // Atualiza a lista de monitores
+          } else {
+              alert('Erro ao adicionar monitor!');
+          }
+      })
+      .catch(error => {
+          console.error('Erro ao enviar a requisição:', error);
+      });
+  }
+
+  // Função para carregar os monitores cadastrados
+  function loadMonitores() {
+      fetch('http://localhost:8080/api/monitor') // Endpoint para listar os monitores
+      .then(response => response.json())
+      .then(monitores => {
+          const tableBody = document.getElementById("monitorTable").getElementsByTagName("tbody")[0];
+          tableBody.innerHTML = ''; // Limpar a tabela antes de adicionar novos itens
+
+          monitores.forEach(monitor => {
+              const row = tableBody.insertRow();
+              row.insertCell(0).textContent = monitor.id;
+              row.insertCell(1).textContent = monitor.nome;
+              row.insertCell(2).textContent = monitor.tipo;
+              row.insertCell(3).textContent = monitor.tamanho;
+              row.insertCell(4).textContent = monitor.preco;
+
+              // Coluna para ações: detalhes e excluir
+              const actionsCell = row.insertCell(5);
+              actionsCell.innerHTML = `
+                  <button class="w3-button w3-blue w3-small" onclick="viewDetails(${monitor.id})">Detalhes</button>
+                  <button class="w3-button w3-red w3-small" onclick="deleteMonitor(${monitor.id})">Excluir</button>
+                  <button class="w3-button w3-green w3-small" onclick="editMonitor(${monitor.id})">Editar</button>
+              `;
+          });
+      })
+      .catch(error => {
+          console.error('Erro ao carregar monitores:', error);
+      });
+  }
+
+  // Função para excluir um monitor
+  function deleteMonitor(monitorId) {
+      fetch(`http://localhost:8080/api/monitor/${monitorId}`, {
+          method: 'DELETE',
+      })
+      .then(response => {
+          if (response.ok) {
+              alert('Monitor excluído com sucesso!');
+              loadMonitores(); // Atualiza a lista
+          } else {
+              alert('Erro ao excluir monitor!');
+          }
+      })
+      .catch(error => {
+          console.error('Erro ao excluir monitor:', error);
+      });
+  }
+
+  // Função para exibir os detalhes do monitor
+  function viewDetails(monitorId) {
+      fetch(`http://localhost:8080/api/monitor/${monitorId}`)
+      .then(response => response.json())
+      .then(monitor => {
+          document.getElementById("monitorDetails").textContent = `
+              Id: ${monitor.id}
+              Nome: ${monitor.nome}
+              Tipo: ${monitor.tipo}
+              Tamanho: ${monitor.tamanho}
+              Preço: ${monitor.preco}
+          `;
+          document.getElementById('monitorModal').style.display = 'block';
+      })
+      .catch(error => {
+          console.error('Erro ao carregar detalhes do monitor:', error);
+      });
+  }
+
+  function editMonitor(monitorId) {
+    window.location.href = "MonitorAlterar.html?id=" + monitorId;
+}
+
+  // Carregar monitores ao carregar a página
+  window.onload = loadMonitores;
+</script>
+
+</body>
+</html>
