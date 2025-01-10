@@ -4,6 +4,8 @@
 
 This project is a **Spring Boot** application that provides RESTful APIs and a web-based interface for managing monitor data. The backend interacts with a **file-based H2 database** using **JDBC** and uses **Lombok** to simplify Java development. The web interface is built with **HTML, CSS, and JavaScript** and interacts with the backend REST API.
 
+This server is used by the companion Android application, available at: **[Monitor Android App](https://github.com/ViniciusCastellani/MonitorApp)**
+
 ---
 
 ## Features
